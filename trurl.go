@@ -16,6 +16,7 @@ type Trurl struct {
 	Url      string
 	Scheme   string
 	User     string
+	Password string
 	Host     string
 	Port     string
 	Path     string
@@ -30,8 +31,18 @@ func Parse(s string) (*Trurl, error) {
 	}
 
 	t := Trurl{
-		Url:  s,
-		Port: u.Port(),
+		Url:      s,
+		Port:     u.Port(),
+		Host:     u.Host,
+		Scheme:   u.Scheme,
+		User:     u.User.Username(),
+		Path:     u.Path,
+		Fragment: u.Fragment,
+	}
+
+	// Parse Password.
+	if pass, ok := u.User.Password(); ok {
+		t.Password = pass
 	}
 
 	// Parse port.
