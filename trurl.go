@@ -21,23 +21,26 @@ type Trurl struct {
 	Port     string
 	Path     string
 	Fragment string
+	RawUrl   *url.URL
 }
 
-func Parse(s string) (*Trurl, error) {
+// Parse will give s as string and parse it into Trurl struct.
+func Parse(s string) *Trurl {
 	// Parse URL.
 	u, err := url.Parse(s)
 	if err != nil {
-		return nil, err
+		return &Trurl{}
 	}
 
 	t := Trurl{
-		Url:      s,
+		Url:      strings.ToLower(s),
 		Port:     u.Port(),
 		Host:     u.Host,
 		Scheme:   u.Scheme,
 		User:     u.User.Username(),
 		Path:     u.Path,
 		Fragment: u.Fragment,
+		RawUrl:   u,
 	}
 
 	// Parse Password.
@@ -54,5 +57,14 @@ func Parse(s string) (*Trurl, error) {
 		}
 	}
 
-	return &t, nil
+	return &t
+}
+
+// SetHost will set host on given url and Trurl.Host value.
+func (t *Trurl) SetHost(h string) *Trurl {
+	t.Host = h
+	t.RawUrl.Host = h
+	t.Url = strings.ToLower(t.RawUrl.String())
+
+	return t
 }
